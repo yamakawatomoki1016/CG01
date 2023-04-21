@@ -217,35 +217,76 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
-	/*typedef struct D3D12_CPU_DESCRIPTOR_HANDLE {
+	typedef struct D3D12_CPU_DESCRIPTOR_HANDLE {
 		SIZE_T ptr;
 	}D3D12_CPU_DESCRIPTOR_HANDLE;
 
-	rtvHandles[0] = rtvStartHandle;
+	/*rtvHandles[0] = rtvStartHandle;
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize();*/
 
-	////これから書き込むバックバッファのインデックスを取得
-	//UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	////描画先のRTVを設定する
-	//commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-	////指定した色で画面全体をクリアする
-	//float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//青っぽい色、RGBAの順
-	//commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-	////コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-	//hr = commandList->Close();
-	//assert(SUCCEEDED(hr));
+	//これから書き込むバックバッファのインデックスを取得
+	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	//描画先のRTVを設定する
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+	//指定した色で画面全体をクリアする
+	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//青っぽい色、RGBAの順
+	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	//コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	hr = commandList->Close();
+	assert(SUCCEEDED(hr));
 
-	////GPUにコマンドリストの実行を行わせる
-	//ID3D12CommandList* commandList[] = { commandList };
-	//commandQueue->ExecuteCommandLists(1, commandLists);
-	////GPUとOS2画面の交換を行うように通知する
-	//swapChain->Present(1, 0);
-	////次のフレーム用のコマンドリストを準備
-	//hr = commandAllocator->Reset();
-	//assert(SUCCEEDED(hr));
-	//hr = commandList->Reset(commandAllocator, nullptr);
-	//assert(SUCCEEDED(hr));
+	//GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandList[] = { commandList };
+	commandQueue->ExecuteCommandLists(1, commandLists);
+	//GPUとOS2画面の交換を行うように通知する
+	swapChain->Present(1, 0);
+	//次のフレーム用のコマンドリストを準備
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+	hr = commandList->Reset(commandAllocator, nullptr);
+	assert(SUCCEEDED(hr));
 
+#ifdef _DEBUG
+	ID3D12Debug1* debugController = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+		//デバッグレイヤーを有効化する
+		debugController->EnableDebugLayer();
+		//さらにGPU側でもチェックを行うようにする
+		debugController->SetEnableGPUBasedValidation(TRUE);
+
+	}
+#endif // 
+
+#ifdef _DEBUG
+	ID3D12Debug1* infoQueue = nullptr;
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+		//やばいエラー時に止まる
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPITION, true);
+		//エラー時に止まる
+		infoQueue->SetBreakOnseverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+		//解散
+		infoQueue->Release();
+	}
+#endif // _DEBUG
+
+	//解散
+	infoQueue->Release();
+	//抑制するメッセージのID
+	D3D12_MESSAGE_ID denyIds[] = {
+		//Windows11でのDXGIデバックレイヤーとDX12デバッグレイヤーぼ相互作用バグによるエラーメッセージ
+	//https//stackoverflow.com/Question/69805245/directx-12-application-is-crashing-in-windows-11
+	D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMACHING_COMMAND_LIST_TYPE
+	};
+
+	//抑制するレベル
+	D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
+	D3D12_INFO_QUEUE_FILTER filter{};
+	filter.DenyList.NumIDs = _countof(denyIds);
+	filter.DenyList.pCategoryList = denyIds;
+	filter.DenyList.NumSeverities = _countof(severities);
+	filter.DenyList.pSeverityList = severities;
+	//指定したメッセージの表示を抑制する
+	infoQueue->PushStorageFilter(&filter);
 	MSG msg{};
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
