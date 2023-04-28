@@ -126,7 +126,8 @@ IDxcBlob* CompileShader(
 
 }
 
-
+struct Vector4 {
+};
 
 //ウィンドウプロシーシャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
