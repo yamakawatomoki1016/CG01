@@ -16,7 +16,6 @@ void Log(const std::string& message) {
 
 void DirectXManager::Initialize(WinApp* win, int32_t backBufferWidth, int32_t backBufferHeight)
 {
-
 	winApp_ = win;
 	backBufferWidth_ = backBufferWidth;
 	backBufferHeight_ = backBufferHeight;
@@ -79,7 +78,7 @@ void DirectXManager::InitializeDXGIDevice() {
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 		//警告時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
-		//抑制するめっせーじのID 
+		//抑制するメッセージのID 
 		D3D12_MESSAGE_ID denyIds[] = {
 		D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
 		};

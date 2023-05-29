@@ -42,7 +42,6 @@ void WinApp::CreateGameWindow(const wchar_t* title, int32_t clientWidth, int32_t
 	}
 #endif  
 	ShowWindow(hwnd_, SW_SHOW);
-
 }
 
 bool WinApp::Procesmessage() {
