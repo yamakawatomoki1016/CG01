@@ -24,7 +24,7 @@ private:
 	static const int32_t kClientWidth = 720;
 	static const int32_t kClientHeight = 1280;
 	static	inline WNDCLASS wc_{};
-	static	inline 	RECT wrc_ = { 0,0,kClientHeight,kClientHeight };
+	static	inline 	RECT wrc_ = { 0,0,kClientHeight,kClientWidth };
 	static	HWND hwnd_;
 	static	UINT windowStyle_;
 	static ID3D12Debug1* debugController_;
