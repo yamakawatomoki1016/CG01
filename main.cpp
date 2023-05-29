@@ -1,13 +1,22 @@
-#include"WinApp.h"
-const char kWindowTitle[] = "CG2_DirectX";
+#include "DirectXManager.h"
 
-// Windowsアプリでのエントリーポイント(main関数)
+//Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	DirectXManager* direct = nullptr;
 
-	WinApp::CreateWindowView();
+	WinApp* win_ = nullptr;
+	direct->Initialize(win_, 1280, 720);
 
-	while (WinApp::ProccessMessage() == 0) {
+	while (true) {
+		direct->PreDraw();
+		// メッセージ処理
+		if (win_->Procesmessage()) {
+			break;
+		}
+
+		direct->PostDraw();
 
 	}
+	direct->Finalize();
 	return 0;
 }
