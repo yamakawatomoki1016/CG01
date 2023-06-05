@@ -10,6 +10,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Winmm.lib")
+
 void Log(const std::string& message) {
 	OutputDebugStringA(message.c_str());
 }
@@ -35,6 +36,46 @@ void DirectXManager::Initialize(WinApp* win, int32_t backBufferWidth, int32_t ba
 	// フェンス生成
 	CreateFence();
 }
+
+IDxcBlob* DirectXManager::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler, DxcBuffer shaderSourceBuffer, IDxcResult* shaderResult, IDxcBlobEncoding* shaderSource, IDxcBlobUtf8* shaderError)
+{
+	//これからシェーダーをコンパイルする旨をログに出す
+	Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
+	HRESULT hr_ = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	//読めなかったら止める
+	assert(SUCCEEDED(hr_));
+	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+	shaderSourceBuffer.Encoding = DXC_CP_UTF8;//UTFの文字コードであることを通知
+	LPCWSTR arguments[] = {
+		filePath.c_str(), //コンパイル対象hlslファイル名
+		L"-E",L"main",   //エントリーポイントの指定。基本的にmain以外にはしない
+		L"-T",profile,   //ShaderProfileの設定
+		L"-Zi",L"-Qembed_debug",//デバッグ用の情報を埋め込む
+		L"-0d",  //最適化を外しておく
+		L"-Zpr",  //メモリレイアウトは行優先
+	};
+
+	hr_ = dxcCompiler->Compile(
+		&shaderSourceBuffer,
+		arguments,
+		_countof(arguments),
+		includeHandler,
+		IID_PPV_ARGS(&shaderResult)
+	);
+	//コンパイルエラーではなくdxが起動できないなど致命的な状況
+	assert(SUCCEEDED(hr_));
+
+	//警告・エラーが出てたらログに出して止める
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+		Log(shaderError->GetStringPointer());
+		//警告・ダメゼッタイ
+		assert(false);
+	}
+	return nullptr;
+}
+
 //デバイスの作成
 void DirectXManager::InitializeDXGIDevice() {
 	dxgiFactory_ = nullptr;
@@ -182,6 +223,24 @@ void DirectXManager::CreateFence() {
 	assert(fenceEvent_ != nullptr);
 
 }
+
+void DirectXManager::IntializeDxcCompiler(IDxcUtils* dxcUtils,IDxcIncludeHandler* includeHandler, IDxcCompiler3* dxcCompiler)
+{
+	//dxcCompilerを初期化
+	hr_ = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	assert(SUCCEEDED(hr_));
+	hr_ = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	assert(SUCCEEDED(hr_));
+
+	//現時点でincludeはしないが、includeに対応するための設定を行っておく
+	hr_ = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler);
+	assert(SUCCEEDED(hr_));
+
+	
+
+}
+
+
 void DirectXManager::PreDraw()
 {
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
