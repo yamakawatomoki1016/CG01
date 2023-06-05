@@ -236,8 +236,6 @@ void DirectXManager::IntializeDxcCompiler(IDxcUtils* dxcUtils,IDxcIncludeHandler
 	hr_ = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr_));
 
-	
-
 }
 
 
