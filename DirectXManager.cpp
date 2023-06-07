@@ -37,15 +37,18 @@ void DirectXManager::Initialize(WinApp* win, int32_t backBufferWidth, int32_t ba
 	CreateFence();
 }
 
-IDxcBlob* DirectXManager::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler, DxcBuffer shaderSourceBuffer, IDxcResult* shaderResult, IDxcBlobEncoding* shaderSource, IDxcBlobUtf8* shaderError)
+IDxcBlob* DirectXManager::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
 {
 	//これからシェーダーをコンパイルする旨をログに出す
 	Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
-	HRESULT hr_ = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	//hlslファイルを読む
+	IDxcBlobEncoding* shaderSource = nullptr;
+	HRESULT hr_ = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource_);
 	//読めなかったら止める
 	assert(SUCCEEDED(hr_));
-	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+	DxcBuffer shaderSourceBuffer;
+	shaderSourceBuffer.Ptr = shaderSource_->GetBufferPointer();
+	shaderSourceBuffer.Size = shaderSource_->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;//UTFの文字コードであることを通知
 	LPCWSTR arguments[] = {
 		filePath.c_str(), //コンパイル対象hlslファイル名
@@ -61,19 +64,40 @@ IDxcBlob* DirectXManager::CompileShader(const std::wstring& filePath, const wcha
 		arguments,
 		_countof(arguments),
 		includeHandler,
-		IID_PPV_ARGS(&shaderResult)
+		IID_PPV_ARGS(&shaderResult_)
 	);
 	//コンパイルエラーではなくdxが起動できないなど致命的な状況
 	assert(SUCCEEDED(hr_));
 
 	//警告・エラーが出てたらログに出して止める
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
+	IDxcBlobUtf8* shaderError = nullptr;
+	shaderResult_->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		Log(shaderError->GetStringPointer());
 		//警告・ダメゼッタイ
 		assert(false);
 	}
+
+	//コンパイル結果から実行用のπなり部分を取得
+	IDxcBlob* shaderBlob = nullptr;
+	hr_ = shaderResult_->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr_));
+	//成功したらログを出す
+	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	
 	return nullptr;
+	//実行用のパイナリを返却
+	return shaderBlob;
+
+	//Shaderをコンパイルする
+	IDxcBlob* vertexShaderBlob = CompileShader(L"Object3D.VS.hlsl",
+		L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	assert(vertexShaderBlob != nullptr);
+
+	IDxcBlob* pixelShaderBlob = CompileShader(L"Object3D.PS.hlsl",
+		L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	assert(pixelShaderBlob != nullptr);
+
 }
 
 //デバイスの作成
@@ -233,11 +257,55 @@ void DirectXManager::IntializeDxcCompiler(IDxcUtils* dxcUtils,IDxcIncludeHandler
 	assert(SUCCEEDED(hr_));
 
 	//現時点でincludeはしないが、includeに対応するための設定を行っておく
-	hr_ = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler);
+	hr_ = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr_));
 
 }
 
+void DirectXManager::CreateRootSignature(D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature, ID3DBlob* signatureBlob, ID3DBlob* errorBlob, ID3D12RootSignature* rootSignature, D3D12_INPUT_LAYOUT_DESC inputLayoutDesc, D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc, ID3D12PipelineState* graphicsPipelineState)
+{
+	//RootSignature作成
+	descriptionRootSignature.Flags =
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//シリアライズしてパイナリにする
+	hr_ = D3D12SerializeRootSignature(&descriptionRootSignature,
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr_)) {
+		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	//パイナリを元に生成
+	hr_ = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	assert(SUCCEEDED(hr_));
+	inputElementDescs_[0].SemanticName = "POSITION";
+	inputElementDescs_[0].SemanticIndex = 0;
+	inputElementDescs_[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs_[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputLayoutDesc.pInputElementDescs = inputElementDescs_;
+	inputLayoutDesc.NumElements = _countof(inputElementDescs_);
+
+	graphicsPipelineStateDesc.pRootSignature = rootSignature;//RootSignature
+	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
+	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
+	vertexShaderBlob->GetBufferSize() };
+
+}
+
+void DirectXManager::BlendSetting(D3D12_BLEND_DESC blendDesc)
+{
+	//すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask =
+		D3D12_COLOR_WRITE_ENABLE_ALL;
+}
+
+void DirectXManager::RasiterzerState(D3D12_RASTERIZER_DESC rasterzerDesc)
+{
+	//裏面（時計回り）を表示しない
+	rasterzerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//三角形を塗りつぶす
+	rasterzerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+}
 
 void DirectXManager::PreDraw()
 {
@@ -312,6 +380,8 @@ void DirectXManager::Finalize() {
 	device_->Release();
 	useAdapter_->Release();
 	dxgiFactory_->Release();
+	shaderSource_->Release();
+	shaderResult_->Release();
 #ifdef DEBUG
 	winApp_->GetdebugController()->Release();
 #endif // DEBUG

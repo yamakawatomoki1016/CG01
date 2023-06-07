@@ -12,7 +12,7 @@ class DirectXManager
 {
 public:
 	void Initialize(WinApp* win, int32_t backBufferWidth,int32_t backBufferHeight);
-	IDxcBlob* CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler, DxcBuffer shaderSourceBuffer, IDxcResult* shaderResult, IDxcBlobEncoding* shaderSource,IDxcBlobUtf8* shaderError);
+	IDxcBlob* CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler);
 	void PreDraw();
 	void PostDraw();
 	void ClearRenderTarget();
@@ -38,7 +38,9 @@ private:
 	static ID3D12Fence* fence_;
 	static HANDLE fenceEvent_;
 	static HRESULT hr_;
-	static IDxcUtils* dxcUtils_;
+	static IDxcResult* shaderResult_;
+	static IDxcBlobEncoding* shaderSource_;
+	static D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();
@@ -46,4 +48,8 @@ private:
 	void CreateFinalRenderTargets();
 	void CreateFence();
 	void IntializeDxcCompiler(IDxcUtils* dxcUtils, IDxcIncludeHandler* includeHandler, IDxcCompiler3* dxcCompiler);
+	void CreateRootSignature(D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature,ID3DBlob* signatureBlob, ID3DBlob* errorBlob,ID3D12RootSignature* rootSignature, D3D12_INPUT_LAYOUT_DESC inputLayoutDesc,
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc,ID3D12PipelineState* graphicsPipelineState);
+	void BlendSetting(D3D12_BLEND_DESC blendDesc);
+	void RasiterzerState(D3D12_RASTERIZER_DESC rasterzerDesc);
 };
