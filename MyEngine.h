@@ -23,9 +23,6 @@ private:
 	void BlendSetting();
 	void RasiterzerState();
 	void CreateGraphicsPipelineState();
-	/*void CreateVertexResource();
-	void CreateVertexBufferView();
-	void VertexDate();*/
 	void Viewport();
 	static DirectXManager* directXManager;
 	Triangle* triangle_[10];
