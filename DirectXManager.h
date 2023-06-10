@@ -39,10 +39,6 @@ public:
 	static ID3D12Fence* fence_;
 	static HANDLE fenceEvent_;
 	static HRESULT hr_;
-	/*static IDxcResult* shaderResult_;
-	static IDxcBlobEncoding* shaderSource_;*/
-	
-	//static DxcBuffer shaderSourceBuffer_;
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();
