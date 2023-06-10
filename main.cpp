@@ -1,22 +1,27 @@
-#include "DirectXManager.h"
+#include "MyEngine.h"
+#include "Triangle.h"
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	DirectXManager* direct = nullptr;
-
-	WinApp* win_ = nullptr;
-	direct->Initialize(win_, 1280, 720);
-
+	WinApp* win_ =nullptr;
+	MyEngine* myEngine = new MyEngine();
+	myEngine->Initialize(win_, 1280, 720);
+	myEngine->VariableInitialize();
+	
 	while (true) {
-		direct->PreDraw();
 		// メッセージ処理
 		if (win_->Procesmessage()) {
 			break;
 		}
+		
+		myEngine->BeginFrame();
+		//更新処理
 
-		direct->PostDraw();
-
+		//描画処理
+		myEngine->Draw();
+		myEngine->EndFrame();
+		
 	}
-	direct->Finalize();
+	myEngine->Finalize();
 	return 0;
 }
