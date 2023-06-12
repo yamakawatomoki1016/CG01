@@ -15,8 +15,6 @@ void MyEngine::Initialize(WinApp* win, int32_t backBufferWidth, int32_t backBuff
 
 	CreateGraphicsPipelineState();
 
-	
-
 	Viewport();
 }
 
