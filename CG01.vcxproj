@@ -92,7 +92,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Conbert.cpp" />
+    <ClCompile Include="Convert.cpp" />
     <ClCompile Include="DirectXManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyEngine.cpp" />
@@ -100,7 +100,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Conbert.h" />
+    <ClInclude Include="Convert.h" />
     <ClInclude Include="DirectXManager.h" />
     <ClInclude Include="MyEngine.h" />
     <ClInclude Include="Triangle.h" />

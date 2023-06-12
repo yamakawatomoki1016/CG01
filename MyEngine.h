@@ -1,6 +1,6 @@
 #pragma once
 #include "WinApp.h"
-#include "conbert.h"
+#include "Convert.h"
 #include <dxcapi.h>
 #include "Vector4.h"
 #include "Triangle.h"
