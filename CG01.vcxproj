@@ -80,13 +80,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Combert.cpp" />
+    <ClCompile Include="Conbert.cpp" />
     <ClCompile Include="DirectXManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Combert.h" />
+    <ClInclude Include="Conbert.h" />
     <ClInclude Include="DirectXManager.h" />
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="WinApp.h" />
