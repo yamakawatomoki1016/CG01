@@ -1,6 +1,6 @@
 #include "WinApp.h"
 
-LRESULT WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	
 	switch (msg) {
@@ -15,7 +15,7 @@ void WinApp::CreateWindowView()
 {
 	wc.lpfnWndProc = WindowProc;
 	wc.lpszClassName = L"CG2WindowClass";
-	wc.hInstance = DrvGetModuleHandle(nullptr);
+	wc.hInstance = GetModuleHandle(nullptr);
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
 	RegisterClass(&wc);

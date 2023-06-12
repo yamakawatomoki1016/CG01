@@ -1,10 +1,9 @@
 #include "WinApp.h"
+const char kWindowTitle[] = "CG2_DirectX";
 
 //Windowsアプリでのエントリーポイント（main関数）
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	//出力ウィンドウへの文字出力
-	OutputDebugStringA("Hello,DirectX!\n");
-
+	
 	WinApp::CreateWindowView();
 
 	while (WinApp::ProccessMessage() == 0) {
