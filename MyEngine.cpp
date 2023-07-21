@@ -116,12 +116,18 @@ void MyEngine::IntializeDxcCompiler()
 	assert(SUCCEEDED(hr));
 }
 
-
 void MyEngine::CreateRootSignature()
 {
 	//RootSignature作成
 	descriptionRootSignature_.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	//RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ一の配列
+	rootParameters_[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; //CBVを使う
+	rootParameters_[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //PixelShaderで使う
+	rootParameters_[0].Descriptor.ShaderRegister = 0; //レジスタ番号0とバインド
+	descriptionRootSignature_.pParameters = rootParameters_; //ルートパラメータ―配列へのポインタ
+	descriptionRootSignature_.NumParameters = _countof(rootParameters_); //配列の長さ
 	//シリアライズしてパイナリにする
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
@@ -259,7 +265,7 @@ void MyEngine::Viewport()
 void MyEngine::Draw()
 {
 	for (int i = 0; i < 10; i++) {
-		triangle_[i]->Draw(left_[i],top_[i],right_[i]);
+		triangle_[i]->Draw(left_[i],top_[i],right_[i],material[i]);
 	}
 }
 

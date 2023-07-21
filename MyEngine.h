@@ -29,6 +29,7 @@ private:
 	Vector4 left_[10];
 	Vector4 top_[10];
 	Vector4 right_[10];
+	Vector4 material[10];
 	static WinApp* winApp_;
     D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
     IDxcUtils* dxcUtils_;
@@ -45,5 +46,6 @@ private:
     D3D12_RASTERIZER_DESC rasterizerDesc_;
     D3D12_VIEWPORT viewport_;
     D3D12_RECT scissorRect_;
+	D3D12_ROOT_PARAMETER rootParameters_[1];
 };
 
