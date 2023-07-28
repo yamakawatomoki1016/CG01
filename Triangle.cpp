@@ -3,7 +3,7 @@
 #include "Vector4.h"
 #include "MyEngine.h"
 
-void Triangle::Initialize(DirectXManager* directX, Vector4 left, Vector4 top, Vector4 right, Vector4 material){
+void Triangle::Initialize(DirectXManager* directX, TriangleData left, TriangleData top, TriangleData right, TriangleData material){
 	directXManager_ = directX;
 
 	SetColor();
