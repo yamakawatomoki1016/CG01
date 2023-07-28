@@ -195,50 +195,49 @@ void MyEngine::CreateGraphicsPipelineState()
 
 void MyEngine::VariableInitialize()
 {
-	
-	left_[0] = { -0.2f,-0.1f,0.0f,1.0f };
-	top_[0] = { -0.15f,0.1f,0.0f,1.0f };
-	right_[0] = { -0.1f,-0.1f,0.0f,1.0f };
+	triangleVertex_[0].v1 = { -0.2f,-0.1f,0.0f,1.0f };
+	triangleVertex_[0].v2 = { -0.15f,0.1f,0.0f,1.0f };
+	triangleVertex_[0].v3 = { -0.1f,-0.1f,0.0f,1.0f };
 
-	left_[1] = { -0.2f,-0.3f,0.0f,1.0f };
-	top_[1] = { -0.15f,-0.1f,0.0f,1.0f };
-	right_[1] = { -0.1f,-0.3f,0.0f,1.0f };
+	triangleVertex_[1].v1 = { -0.2f,-0.3f,0.0f,1.0f };
+	triangleVertex_[1].v2 = { -0.15f,-0.1f,0.0f,1.0f };
+	triangleVertex_[1].v3 = { -0.1f,-0.3f,0.0f,1.0f };
 
-	left_[2] = { -0.2f,-0.5f,0.0f,1.0f };
-	top_[2] = { -0.15f,-0.3f,0.0f,1.0f };
-	right_[2] = { -0.1f,-0.5f,0.0f,1.0f };
+	triangleVertex_[2].v1 = { -0.2f,-0.5f,0.0f,1.0f };
+	triangleVertex_[2].v2 = { -0.15f,-0.3f,0.0f,1.0f };
+	triangleVertex_[2].v3 = { -0.1f,-0.5f,0.0f,1.0f };
 
-	left_[3] = { -0.2f,-0.7f,0.0f,1.0f };
-	top_[3] = { -0.15f,-0.5f,0.0f,1.0f };
-	right_[3] = { -0.1f,-0.7f,0.0f,1.0f };
+	triangleVertex_[3].v1 = { -0.2f,-0.7f,0.0f,1.0f };
+	triangleVertex_[3].v2 = { -0.15f,-0.5f,0.0f,1.0f };
+	triangleVertex_[3].v3 = { -0.1f,-0.7f,0.0f,1.0f };
 
-	left_[4] = { -0.2f,-0.9f,0.0f,1.0f };
-	top_[4] = { -0.15f,-0.7f,0.0f,1.0f };
-	right_[4] = { -0.1f,-0.9f,0.0f,1.0f };
+	triangleVertex_[4].v1 = { -0.2f,-0.9f,0.0f,1.0f };
+	triangleVertex_[4].v2 = { -0.15f,-0.7f,0.0f,1.0f };
+	triangleVertex_[4].v3 = { -0.1f,-0.9f,0.0f,1.0f };
 
-	left_[5] = { -0.2f,0.1f,0.0f,1.0f };
-	top_[5] = { -0.15f,0.3f,0.0f,1.0f };
-	right_[5] = { -0.1f,0.1f,0.0f,1.0f };
+	triangleVertex_[5].v1 = { -0.2f,0.1f,0.0f,1.0f };
+	triangleVertex_[5].v2 = { -0.15f,0.3f,0.0f,1.0f };
+	triangleVertex_[5].v3 = { -0.1f,0.1f,0.0f,1.0f };
 
-	left_[6] = { -0.2f,0.3f,0.0f,1.0f };
-	top_[6] = { -0.15f,0.5f,0.0f,1.0f };
-	right_[6] = { -0.1f,0.3f,0.0f,1.0f };
+	triangleVertex_[6].v1 = { -0.2f,0.3f,0.0f,1.0f };
+	triangleVertex_[6].v2 = { -0.15f,0.5f,0.0f,1.0f };
+	triangleVertex_[6].v3 = { -0.1f,0.3f,0.0f,1.0f };
 
-	left_[7] = { -0.2f,0.5f,0.0f,1.0f };
-	top_[7] = { -0.15f,0.7f,0.0f,1.0f };
-	right_[7] = { -0.1f,0.5f,0.0f,1.0f };
+	triangleVertex_[7].v1 = { -0.2f,0.5f,0.0f,1.0f };
+	triangleVertex_[7].v2 = { -0.15f,0.7f,0.0f,1.0f };
+	triangleVertex_[7].v3 = { -0.1f,0.5f,0.0f,1.0f };
 
-	left_[8] = { -0.2f,0.7f,0.0f,1.0f };
-	top_[8] = { -0.15f,0.9f,0.0f,1.0f };
-	right_[8] = { -0.1f,0.7f,0.0f,1.0f };
+	triangleVertex_[8].v1 = { -0.2f,0.7f,0.0f,1.0f };
+	triangleVertex_[8].v2 = { -0.15f,0.9f,0.0f,1.0f };
+	triangleVertex_[8].v3 = { -0.1f,0.7f,0.0f,1.0f };
 
-	left_[9] = { -0.1f,0.1f,0.0f,1.0f };
-	top_[9] = { 0.25f,0.3f,0.0f,1.0f };
-	right_[9] = { 0.6f,0.1f,0.0f,1.0f };
+	triangleVertex_[9].v1 = { -0.1f,0.1f,0.0f,1.0f };
+	triangleVertex_[9].v2 = { 0.25f,0.3f,0.0f,1.0f };
+	triangleVertex_[9].v3 = { 0.6f,0.1f,0.0f,1.0f };
 
 	for (int i = 0; i < 10; i++) {
 		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(directXManager, left_[i], top_[i], right_[i]);
+		triangle_[i]->Initialize(directXManager, triangleVertex_[i], triangleVertex_[i], triangleVertex_[i]);
 	}
 }
 

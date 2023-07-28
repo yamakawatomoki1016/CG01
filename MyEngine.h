@@ -26,9 +26,7 @@ private:
 	void Viewport();
 	static DirectXManager* directXManager;
 	Triangle* triangle_[10];
-	Vector4 left_[10];
-	Vector4 top_[10];
-	Vector4 right_[10];
+	TriangleData triangleVertex_[10];
 	static WinApp* winApp_;
     D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
     IDxcUtils* dxcUtils_;
