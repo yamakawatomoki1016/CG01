@@ -1,6 +1,4 @@
 #include "DirectXManager.h"
-
-
 #pragma once
 
 class Triangle
