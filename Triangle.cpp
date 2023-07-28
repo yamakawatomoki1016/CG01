@@ -3,20 +3,19 @@
 #include "Vector4.h"
 #include "MyEngine.h"
 
-void Triangle::Initialize(DirectXManager* directX){
+void Triangle::Initialize(DirectXManager* directX, Vector4 left, Vector4 top, Vector4 right){
 	directXManager_ = directX;
-	CreateVertexResource();
-}
-
-void Triangle::Draw(Vector4 left,Vector4 top, Vector4 right)
-{
 	//左下
 	vertexDate_[0] = left;
 	//上
 	vertexDate_[1] = top;
 	//右上
 	vertexDate_[2] = right;
-	
+	CreateVertexResource();
+}
+
+void Triangle::Draw()
+{
 	directXManager_->commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);//VSVを設定
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
 	directXManager_->commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

@@ -6,8 +6,8 @@
 class Triangle
 {
 public:
-	void Initialize(DirectXManager* directX);
-	void Draw(Vector4 left, Vector4 top, Vector4 right);
+	void Initialize(DirectXManager* directX, Vector4 left, Vector4 top, Vector4 right);
+	void Draw();
 	void CreateVertexResource();
 	void Finalize();
 	Triangle();
