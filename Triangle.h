@@ -15,7 +15,7 @@ public:
 	DirectXManager* directXManager_;
 	ID3D12Resource* vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	Vector4* vertexDate_;
+	Vector4* vertexData_;
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	ID3D12Resource* MaterialResource_;
 	Vector4* materialData_;

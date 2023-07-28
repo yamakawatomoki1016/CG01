@@ -145,8 +145,6 @@ void MyEngine::CreateRootSignature()
 	inputElementDescs_[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	inputLayoutDesc_.pInputElementDescs = inputElementDescs_;
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
-
-
 }
 
 void MyEngine::BlendSetting()
@@ -201,10 +199,6 @@ void MyEngine::CreateGraphicsPipelineState()
 
 void MyEngine::VariableInitialize()
 {
-	for (int i = 0; i < 10; i++) {
-		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(directXManager);
-	}
 	left_[0] = { -0.2f,-0.1f,0.0f,1.0f };
 	top_[0] = { -0.15f,0.1f,0.0f,1.0f };
 	right_[0] = { -0.1f,-0.1f,0.0f,1.0f };
@@ -244,6 +238,11 @@ void MyEngine::VariableInitialize()
 	left_[9] = { -0.1f,0.1f,0.0f,1.0f };
 	top_[9] = { 0.25f,0.3f,0.0f,1.0f };
 	right_[9] = { 0.6f,0.1f,0.0f,1.0f };
+
+	for (int i = 0; i < 10; i++) {
+		triangle_[i] = new Triangle();
+		triangle_[i]->Initialize(directXManager, left_[i], top_[i], right_[i], material[i]);
+	}
 }
 
 void MyEngine::Viewport()
@@ -265,7 +264,7 @@ void MyEngine::Viewport()
 void MyEngine::Draw()
 {
 	for (int i = 0; i < 10; i++) {
-		triangle_[i]->Draw(left_[i],top_[i],right_[i],material[i]);
+		triangle_[i]->Draw();
 	}
 }
 
