@@ -195,10 +195,7 @@ void MyEngine::CreateGraphicsPipelineState()
 
 void MyEngine::VariableInitialize()
 {
-	for (int i = 0; i < 10; i++) {
-		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(directXManager,left_[i],top_[i],right_[i]);
-	}
+	
 	left_[0] = { -0.2f,-0.1f,0.0f,1.0f };
 	top_[0] = { -0.15f,0.1f,0.0f,1.0f };
 	right_[0] = { -0.1f,-0.1f,0.0f,1.0f };
@@ -238,6 +235,11 @@ void MyEngine::VariableInitialize()
 	left_[9] = { -0.1f,0.1f,0.0f,1.0f };
 	top_[9] = { 0.25f,0.3f,0.0f,1.0f };
 	right_[9] = { 0.6f,0.1f,0.0f,1.0f };
+
+	for (int i = 0; i < 10; i++) {
+		triangle_[i] = new Triangle();
+		triangle_[i]->Initialize(directXManager, left_[i], top_[i], right_[i]);
+	}
 }
 
 void MyEngine::Viewport()
