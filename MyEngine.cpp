@@ -197,7 +197,7 @@ void MyEngine::VariableInitialize()
 {
 	for (int i = 0; i < 10; i++) {
 		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(directXManager);
+		triangle_[i]->Initialize(directXManager,left_[i],top_[i],right_[i]);
 	}
 	left_[0] = { -0.2f,-0.1f,0.0f,1.0f };
 	top_[0] = { -0.15f,0.1f,0.0f,1.0f };
@@ -259,7 +259,7 @@ void MyEngine::Viewport()
 void MyEngine::Draw()
 {
 	for (int i = 0; i < 10; i++) {
-		triangle_[i]->Draw(left_[i],top_[i],right_[i]);
+		triangle_[i]->Draw();
 	}
 }
 

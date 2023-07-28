@@ -15,6 +15,6 @@ public:
 	DirectXManager* directXManager_;
 	ID3D12Resource* vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	Vector4* vertexDate_;
+	Vector4* vertexData_;
 };
 

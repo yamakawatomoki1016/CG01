@@ -5,13 +5,13 @@
 
 void Triangle::Initialize(DirectXManager* directX, Vector4 left, Vector4 top, Vector4 right){
 	directXManager_ = directX;
-	//左下
-	vertexDate_[0] = left;
-	//上
-	vertexDate_[1] = top;
-	//右上
-	vertexDate_[2] = right;
 	CreateVertexResource();
+	//左下
+	vertexData_[0] = left;
+	//上
+	vertexData_[1] = top;
+	//右上
+	vertexData_[2] = right;
 }
 
 void Triangle::Draw()
@@ -56,7 +56,7 @@ void Triangle::CreateVertexResource()
 	//１頂点あたりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(Vector4);
 	//書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate_));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 }
 
 void Triangle::Finalize()
