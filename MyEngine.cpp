@@ -106,6 +106,7 @@ void MyEngine::Finalize()
 
 void MyEngine::Update()
 {
+	ImGui::ShowDemoWindow();
 	triangleTransform_.rotate.y += 0.03f;
 	worldMatrix_ = MakeAffineMatrix(triangleTransform_.scale, triangleTransform_.rotate, triangleTransform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);

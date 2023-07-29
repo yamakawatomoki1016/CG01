@@ -16,6 +16,8 @@ public:
 	void PreDraw();
 	void PostDraw();
 	void ClearRenderTarget();
+	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device,D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors,bool shaderVisible);
+	void ImguiInitialize();
 	static void Finalize();
 	ID3D12Device* GetDevice() { return device_; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; }
@@ -39,6 +41,10 @@ public:
 	static ID3D12Fence* fence_;
 	static HANDLE fenceEvent_;
 	static HRESULT hr_;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
+	//RTVの設定
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
+	ID3D12DescriptorHeap* srvDescriptorHeap_;
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();

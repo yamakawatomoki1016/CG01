@@ -17,9 +17,7 @@ void Triangle::Initialize(DirectXManager* directX, const TriangleData& vertex)
 }
 void Triangle::SetColor() {
 	MaterialResource_ = CreateBufferResource(directXManager_->GetDevice(), sizeof(Vector4));
-
 	MaterialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-
 }
 void Triangle::CreateWVPResource()
 {
