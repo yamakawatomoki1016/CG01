@@ -104,6 +104,17 @@ void MyEngine::Finalize()
 
 }
 
+void MyEngine::Update()
+{
+	triangleTransform_.rotate.y += 0.03f;
+	worldMatrix_ = MakeAffineMatrix(triangleTransform_.scale, triangleTransform_.rotate, triangleTransform_.translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(directXManager->winApp_->GetWidth()) / float(directXManager->winApp_->GetHeight()), 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix_, Multiply(viewMatrix, projectionMatrix));
+	worldMatrix_ = worldViewProjectionMatrix;
+}
+
 void MyEngine::IntializeDxcCompiler()
 {
 	//dxcCompilerを初期化
@@ -126,6 +137,9 @@ void MyEngine::CreateRootSignature()
 	rootParameters_[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; //CBVを使う
 	rootParameters_[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //PixelShaderで使う
 	rootParameters_[0].Descriptor.ShaderRegister = 0; //レジスタ番号0とバインド
+	rootParameters_[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters_[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters_[1].Descriptor.ShaderRegister = 0;
 	descriptionRootSignature_.pParameters = rootParameters_; //ルートパラメータ―配列へのポインタ
 	descriptionRootSignature_.NumParameters = _countof(rootParameters_); //配列の長さ
 	//シリアライズしてパイナリにする
@@ -136,7 +150,7 @@ void MyEngine::CreateRootSignature()
 		assert(false);
 	}
 	//パイナリを元に生成
-	hr =directXManager->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(),
+	hr = directXManager->GetDevice()->CreateRootSignature(0, signatureBlob_->GetBufferPointer(),
 		signatureBlob_->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -241,8 +255,11 @@ void MyEngine::VariableInitialize()
 
 	for (int i = 0; i < 10; i++) {
 		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(directXManager, triangleVertex_[i], triangleVertex_[i], triangleVertex_[i], material[i]);
+		triangle_[i]->Initialize(directXManager, triangleVertex_[i]);
+		material[i] = { 1.0f,0.0f,0.0f,1.0f };
 	}
+	triangleTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 }
 
 void MyEngine::Viewport()
@@ -264,7 +281,7 @@ void MyEngine::Viewport()
 void MyEngine::Draw()
 {
 	for (int i = 0; i < 10; i++) {
-		triangle_[i]->Draw();
+		triangle_[i]->Draw(material[i],worldMatrix_);
 	}
 }
 

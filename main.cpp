@@ -16,7 +16,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		myEngine->BeginFrame();
 		//更新処理
-
+		myEngine->Update();
 		//描画処理
 		myEngine->Draw();
 		myEngine->EndFrame();

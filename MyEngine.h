@@ -17,6 +17,7 @@ public:
 	void BeginFrame();
 	void EndFrame();
 	void Finalize();
+	void Update();
 private:
 	void IntializeDxcCompiler();
 	void CreateRootSignature();
@@ -27,7 +28,10 @@ private:
 	static DirectXManager* directXManager;
 	Triangle* triangle_[10];
 	TriangleData triangleVertex_[10];
-	TriangleData material[10];
+	Vector4 material[10];
+	Matrix4x4 worldMatrix_;
+	Transform triangleTransform_;
+	Transform cameraTransform_;
 	static WinApp* winApp_;
     D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
     IDxcUtils* dxcUtils_;
@@ -44,6 +48,6 @@ private:
     D3D12_RASTERIZER_DESC rasterizerDesc_;
     D3D12_VIEWPORT viewport_;
     D3D12_RECT scissorRect_;
-	D3D12_ROOT_PARAMETER rootParameters_[1];
+	D3D12_ROOT_PARAMETER rootParameters_[2];
 };
 

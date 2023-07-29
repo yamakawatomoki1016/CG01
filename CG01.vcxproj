@@ -95,6 +95,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Convert.cpp" />
     <ClCompile Include="DirectXManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MaMath.cpp" />
     <ClCompile Include="MyEngine.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="WinApp.cpp" />
@@ -102,8 +103,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Convert.h" />
     <ClInclude Include="DirectXManager.h" />
+    <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="MyEngine.h" />
+    <ClInclude Include="MyMath.h" />
     <ClInclude Include="Triangle.h" />
+    <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="WinApp.h" />
   </ItemGroup>
