@@ -20,7 +20,7 @@ public:
 	static const int32_t kClientWidth = 720;
 	static const int32_t kClientHeight = 1280;
 public:
-	void CreateGameWindow(
+	static void CreateGameWindow(
 	const wchar_t* title,
 	int32_t clientWidth, int32_t clientheight
 	);
