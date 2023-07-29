@@ -1,5 +1,4 @@
-#include "MyEngine.h"
-#include "Triangle.h"
+﻿#include "MyEngine.h"
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {

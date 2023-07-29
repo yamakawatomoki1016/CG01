@@ -1,4 +1,4 @@
-#include "DirectXManager.h"
+﻿#include "DirectXManager.h"
 #include <algorithm>
 #include <cassert>
 #include <thread>

@@ -1,5 +1,5 @@
-#include "Triangle.h"
-#include<assert.h>
+﻿#include "Triangle.h"
+#include <assert.h>
 
 
 void Triangle::Initialize(DirectXManager* directX, const TriangleData& vertex)

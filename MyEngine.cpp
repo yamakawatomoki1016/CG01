@@ -1,4 +1,4 @@
-#include "MyEngine.h"
+﻿#include "MyEngine.h"
 #include <assert.h>
 void MyEngine::Initialize(WinApp* win, int32_t backBufferWidth, int32_t backBufferHeight)
 {
