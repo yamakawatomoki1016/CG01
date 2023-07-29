@@ -5,7 +5,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT Imgui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #pragma comment(lib,"d3d12.lib")
 class WinApp
@@ -17,8 +17,8 @@ public:
 	HINSTANCE GetHInstance()const { return wc_.hInstance; }
 	static	bool Procesmessage();
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-	static const int32_t kClientWidth = 720;
-	static const int32_t kClientHeight = 1280;
+	static const int32_t kClientWidth = 1280;
+	static const int32_t kClientHeight = 720;
 public:
 	static void CreateGameWindow(
 	const wchar_t* title,
@@ -27,7 +27,7 @@ public:
 	static ID3D12Debug1* GetdebugController() { return debugController_; }
 private:
 	static inline WNDCLASS wc_{};
-	static inline RECT wrc_ = { 0,0,kClientHeight,kClientWidth };
+	static inline RECT wrc_ = { 0,0,kClientWidth,kClientHeight };
 	static HWND hwnd_;
 	static UINT windowStyle_;
 	static ID3D12Debug1* debugController_;

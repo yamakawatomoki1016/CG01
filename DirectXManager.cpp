@@ -32,6 +32,8 @@ void DirectXManager::Initialize(WinApp* win, int32_t backBufferWidth, int32_t ba
 
 	// フェンス生成
 	CreateFence();
+
+	ImguiInitialize();
 }
 
 void DirectXManager::ImguiInitialize() {
@@ -280,6 +282,7 @@ void DirectXManager::Finalize() {
 	device_->Release();
 	useAdapter_->Release();
 	dxgiFactory_->Release();
+	srvDescriptorHeap_->Release();
 #ifdef DEBUG
 	winApp_->GetdebugController()->Release();
 #endif // DEBUG
@@ -311,3 +314,4 @@ int32_t DirectXManager::backBufferHeight_;
 ID3D12Fence* DirectXManager::fence_;
 HANDLE DirectXManager::fenceEvent_;
 HRESULT DirectXManager::hr_;
+ID3D12DescriptorHeap* DirectXManager::srvDescriptorHeap_;

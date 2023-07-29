@@ -91,6 +91,9 @@ void MyEngine::EndFrame()
 
 void MyEngine::Finalize()
 {
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 	for (int i = 0; i < 10; i++) {
 		triangle_[i]->Finalize();
 	}
@@ -114,6 +117,10 @@ void MyEngine::Update()
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(directXManager->winApp_->GetWidth()) / float(directXManager->winApp_->GetHeight()), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix_, Multiply(viewMatrix, projectionMatrix));
 	worldMatrix_ = worldViewProjectionMatrix;
+	ImGui::Begin("Triangle");
+	ImGui::DragFloat3("Translate",&triangleTransform_.translate.x,0.1f);
+	ImGui::ColorEdit4("Color Picker", &material[9].x);
+	ImGui::End();
 }
 
 void MyEngine::IntializeDxcCompiler()

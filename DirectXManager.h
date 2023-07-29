@@ -44,7 +44,7 @@ public:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	//RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
-	ID3D12DescriptorHeap* srvDescriptorHeap_;
+	static ID3D12DescriptorHeap* srvDescriptorHeap_;
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();
