@@ -14,6 +14,8 @@ void MyEngine::Initialize(WinApp* win, int32_t backBufferWidth, int32_t backBuff
 
 	RasiterzerState();
 
+	SetDepth();
+
 	CreateGraphicsPipelineState();
 
 	Viewport();
@@ -93,7 +95,7 @@ void MyEngine::EndFrame()
 void MyEngine::Finalize()
 {
 	textureResource_->Release();
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 2; i++) {
 		triangle_[i]->Finalize();
 	}
 	graphicsPipelineState_->Release();
@@ -109,7 +111,7 @@ void MyEngine::Finalize()
 void MyEngine::Update()
 {
 	ImGui::ShowDemoWindow();
-	triangleTransform_.rotate.y += 0.03f;
+	triangleTransform_.rotate.y += 0.01f;
 	worldMatrix_ = MakeAffineMatrix(triangleTransform_.scale, triangleTransform_.rotate, triangleTransform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -236,6 +238,8 @@ void MyEngine::CreateGraphicsPipelineState()
 	//どのように画面に色を打ち込むかの設定（気にしなくてよい）
 	graphicsPipelineStateDesc_.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	graphicsPipelineStateDesc_.DepthStencilState = depthStencilDesc_;
+	graphicsPipelineStateDesc_.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	//実際に生成
 	HRESULT hr = directXManager->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_,
 		IID_PPV_ARGS(&graphicsPipelineState_));
@@ -245,15 +249,15 @@ void MyEngine::CreateGraphicsPipelineState()
 
 void MyEngine::VariableInitialize()
 {
-	triangleVertex_[0].v1 = { -0.2f,-0.1f,0.0f,1.0f };
-	triangleVertex_[0].v2 = { -0.15f,0.1f,0.0f,1.0f };
-	triangleVertex_[0].v3 = { -0.1f,-0.1f,0.0f,1.0f };
+	triangleVertex_[0].v1.position = { -0.5f,-0.5f,0.0f,1.0f };
+	triangleVertex_[0].v2.position = { -0.0f,0.5f,0.0f,1.0f };
+	triangleVertex_[0].v3.position = { 0.5f,-0.5f,0.0f,1.0f };
 
-	triangleVertex_[1].v1 = { -0.2f,-0.3f,0.0f,1.0f };
-	triangleVertex_[1].v2 = { -0.15f,-0.1f,0.0f,1.0f };
-	triangleVertex_[1].v3 = { -0.1f,-0.3f,0.0f,1.0f };
+	triangleVertex_[1].v1.position = { -0.3f,-0.5f,0.5f,1.0f };
+	triangleVertex_[1].v2.position = { -0.0f,-0.0f,0.0f,1.0f };
+	triangleVertex_[1].v3.position = { 0.5f,-0.5f,-0.5f,1.0f };
 
-	triangleVertex_[2].v1 = { -0.2f,-0.5f,0.0f,1.0f };
+	/*triangleVertex_[2].v1 = { -0.2f,-0.5f,0.0f,1.0f };
 	triangleVertex_[2].v2 = { -0.15f,-0.3f,0.0f,1.0f };
 	triangleVertex_[2].v3 = { -0.1f,-0.5f,0.0f,1.0f };
 
@@ -283,12 +287,12 @@ void MyEngine::VariableInitialize()
 
 	triangleVertex_[9].v1 = { -0.1f,0.1f,0.0f,1.0f };
 	triangleVertex_[9].v2 = { 0.25f,0.3f,0.0f,1.0f };
-	triangleVertex_[9].v3 = { 0.6f,0.1f,0.0f,1.0f };
+	triangleVertex_[9].v3 = { 0.6f,0.1f,0.0f,1.0f };*/
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 2; i++) {
 		triangle_[i] = new Triangle();
 		triangle_[i]->Initialize(directXManager, triangleVertex_[i],this);
-		material[i] = { 1.0f,0.0f,0.0f,1.0f };
+		material[i] = { 1.0f,1.0f,1.0f,1.0f };
 	}
 	triangleTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
@@ -390,9 +394,16 @@ void MyEngine::LoadTexture(const std::string& filePath)
 	directXManager->GetDevice()->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU_);
 }
 
+void MyEngine::SetDepth()
+{
+	depthStencilDesc_.DepthEnable = true;
+	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+}
+
 void MyEngine::Draw()
 {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 2; i++) {
 		triangle_[i]->Draw(material[i],worldMatrix_);
 	}
 }

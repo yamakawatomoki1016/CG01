@@ -30,6 +30,7 @@ private:
 	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
 	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 	void LoadTexture(const std::string& filePath);
+	void SetDepth();
 	static DirectXManager* directXManager;
 	Triangle* triangle_[10];
 	TriangleData triangleVertex_[10];
@@ -57,6 +58,7 @@ private:
 	D3D12_DESCRIPTOR_RANGE descriptorRange_[1] = {};
 	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
 	ID3D12Resource* textureResource_;
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 public:
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;

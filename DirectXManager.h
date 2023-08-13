@@ -44,11 +44,15 @@ public:
 	//RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	static ID3D12DescriptorHeap* srvDescriptorHeap_;
+	static ID3D12Resource* depthStencilResource_;
+	static ID3D12DescriptorHeap* dsvDescriptorHeap_;
+	static D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();
 	void InitializeCommand();
 	void CreateFinalRenderTargets();
 	void CreateFence();
-
+	ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height);
+	void CreateDepthStencil();
 };

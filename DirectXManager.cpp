@@ -33,6 +33,8 @@ void DirectXManager::Initialize(WinApp* win, int32_t backBufferWidth, int32_t ba
 	// フェンス生成
 	CreateFence();
 
+	CreateDepthStencil();
+
 	ImguiInitialize();
 }
 
@@ -177,6 +179,47 @@ void DirectXManager::CreateFinalRenderTargets() {
 	//2つ目を作る
 	device_->CreateRenderTargetView(backBuffers_[1], &rtvDesc_, rtvHandles_[1]);
 }
+ID3D12Resource* DirectXManager::CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_HEAP_PROPERTIES heaProperties{};
+	heaProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	ID3D12Resource* resorce = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heaProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&depthClearValue,
+		IID_PPV_ARGS(&resorce));
+	assert(SUCCEEDED(hr));
+	return resorce;
+}
+void DirectXManager::CreateDepthStencil()
+{
+	depthStencilResource_ = CreateDepthStencilTextureResource(device_, winApp_->kClientWidth, winApp_->kClientHeight);
+	dsvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+	device_->CreateDepthStencilView(depthStencilResource_, &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
+}
 // フェンス生成
 void DirectXManager::CreateFence() {
 	//初期値０でFenceを作る
@@ -255,6 +298,10 @@ void DirectXManager::ClearRenderTarget()
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearcolor, 0, nullptr);
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_ };
 	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+
+	dsvHandle_ = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle_);
+	commandList_->ClearDepthStencilView(dsvHandle_, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 ID3D12DescriptorHeap* DirectXManager::CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
@@ -275,6 +322,8 @@ void DirectXManager::Finalize() {
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+	depthStencilResource_->Release();
+	dsvDescriptorHeap_->Release();
 	srvDescriptorHeap_->Release();
 	rtvDescriptorHeap_->Release();
 	backBuffers_[0]->Release();
@@ -318,3 +367,6 @@ ID3D12Fence* DirectXManager::fence_;
 HANDLE DirectXManager::fenceEvent_;
 HRESULT DirectXManager::hr_;
 ID3D12DescriptorHeap* DirectXManager::srvDescriptorHeap_;
+ID3D12Resource* DirectXManager::depthStencilResource_;
+ID3D12DescriptorHeap* DirectXManager::dsvDescriptorHeap_;
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::dsvHandle_;
