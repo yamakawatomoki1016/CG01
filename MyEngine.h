@@ -6,6 +6,8 @@
 #include "Triangle.h"
 #include "DirectXManager.h"
 #include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
+#include <vector>
 #pragma comment(lib, "dxcompiler.lib")
 
 class MyEngine
