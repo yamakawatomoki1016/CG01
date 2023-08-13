@@ -1,5 +1,6 @@
-﻿#include "MyEngine.h"
+#include "MyEngine.h"
 #include <assert.h>
+#include "Convert.h"
 void MyEngine::Initialize(WinApp* win, int32_t backBufferWidth, int32_t backBufferHeight)
 {
 	directXManager = new DirectXManager();
@@ -91,9 +92,6 @@ void MyEngine::EndFrame()
 
 void MyEngine::Finalize()
 {
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
 	for (int i = 0; i < 10; i++) {
 		triangle_[i]->Finalize();
 	}
@@ -104,7 +102,7 @@ void MyEngine::Finalize()
 	}
 	rootSignature_->Release();
 	directXManager->Finalize();
-
+	textureResource_->Release();
 }
 
 void MyEngine::Update()
@@ -148,7 +146,25 @@ void MyEngine::CreateRootSignature()
 	rootParameters_[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters_[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters_[1].Descriptor.ShaderRegister = 0;
-	descriptionRootSignature_.pParameters = rootParameters_; //ルートパラメータ―配列へのポインタ
+	rootParameters_[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters_[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters_[2].DescriptorTable.pDescriptorRanges = descriptorRange_;
+	rootParameters_[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange_);
+	descriptorRange_[0].BaseShaderRegister = 0;
+	descriptorRange_[0].NumDescriptors = 1;
+	descriptorRange_[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange_[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	staticSamplers_[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSamplers_[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers_[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers_[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers_[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	staticSamplers_[0].MaxLOD = D3D12_FLOAT32_MAX;
+	staticSamplers_[0].ShaderRegister = 0;
+	staticSamplers_[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	descriptionRootSignature_.pStaticSamplers = staticSamplers_;
+	descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers_);
+		descriptionRootSignature_.pParameters = rootParameters_; //ルートパラメータ―配列へのポインタ
 	descriptionRootSignature_.NumParameters = _countof(rootParameters_); //配列の長さ
 	//シリアライズしてパイナリにする
 	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature_,
@@ -165,6 +181,13 @@ void MyEngine::CreateRootSignature()
 	inputElementDescs_[0].SemanticIndex = 0;
 	inputElementDescs_[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs_[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs_[1].SemanticName = "TEXCOORD";
+	inputElementDescs_[1].SemanticIndex = 0;
+	inputElementDescs_[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs_[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+	inputLayoutDesc_.pInputElementDescs = inputElementDescs_;
+	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 	inputLayoutDesc_.pInputElementDescs = inputElementDescs_;
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 }
@@ -263,11 +286,12 @@ void MyEngine::VariableInitialize()
 
 	for (int i = 0; i < 10; i++) {
 		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(directXManager, triangleVertex_[i]);
+		triangle_[i]->Initialize(directXManager, triangleVertex_[i],this);
 		material[i] = { 1.0f,0.0f,0.0f,1.0f };
 	}
 	triangleTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	LoadTexture("Resources/uvChecker.png");
 }
 
 void MyEngine::Viewport()
@@ -284,6 +308,85 @@ void MyEngine::Viewport()
 	scissorRect_.right = winApp_->kClientWidth;
 	scissorRect_.top = 0;
 	scissorRect_.bottom = winApp_->kClientHeight;
+}
+
+DirectX::ScratchImage MyEngine::LoadTex(const std::string& filePath)
+{
+	DirectX::ScratchImage image{};
+	std::wstring filePathW = ConvertString(filePath);
+	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	assert(SUCCEEDED(hr));
+
+	DirectX::ScratchImage mipImages{};
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	assert(SUCCEEDED(hr));
+
+	return mipImages;
+}
+
+ID3D12Resource* MyEngine::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+{
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = UINT(metadata.width);
+	resourceDesc.Height = UINT(metadata.height);
+	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
+	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+	resourceDesc.Format = metadata.format;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+	return resource;
+}
+
+void MyEngine::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
+{
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
+		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+		HRESULT hr = texture->WriteToSubresource(
+			UINT(mipLevel),
+			nullptr,
+			img->pixels,
+			UINT(img->rowPitch),
+			UINT(img->slicePitch)
+		);
+		assert(SUCCEEDED(hr));
+	}
+}
+
+void MyEngine::LoadTexture(const std::string& filePath)
+{
+	DirectX::ScratchImage mipImages = LoadTex(filePath);
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textureResource_ = CreateTextureResource(directXManager->GetDevice(), metadata);
+	UploadTextureData(textureResource_, mipImages);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+	textureSrvHandleCPU_ = directXManager->srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+    textureSrvHandleGPU_ = directXManager->srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+
+	textureSrvHandleCPU_.ptr += directXManager->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU_.ptr += directXManager->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	directXManager->GetDevice()->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU_);
 }
 
 void MyEngine::Draw()

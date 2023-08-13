@@ -1,7 +1,8 @@
-﻿#include "MyEngine.h"
+#include "MyEngine.h"
 
 //Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	CoInitializeEx(0, COINIT_MULTITHREADED);
 	WinApp* win_ =nullptr;
 	MyEngine* myEngine = new MyEngine();
 	myEngine->Initialize(win_, 1280, 720);
@@ -22,5 +23,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 	}
 	myEngine->Finalize();
+	CoUninitialize();
 	return 0;
 }

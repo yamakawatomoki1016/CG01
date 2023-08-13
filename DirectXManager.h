@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <chrono>
 #include <cstdlib>
 #include <dxgi1_6.h>
@@ -21,7 +21,6 @@ public:
 	static void Finalize();
 	ID3D12Device* GetDevice() { return device_; }
 	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; }
-	
 public:
 	static WinApp* winApp_;
 	static IDXGIAdapter4* useAdapter_;

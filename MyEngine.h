@@ -5,6 +5,7 @@
 #include "Vector4.h"
 #include "Triangle.h"
 #include "DirectXManager.h"
+#include "externals/DirectXTex/DirectXTex.h"
 #pragma comment(lib, "dxcompiler.lib")
 
 class MyEngine
@@ -25,6 +26,10 @@ private:
 	void RasiterzerState();
 	void CreateGraphicsPipelineState();
 	void Viewport();
+	DirectX::ScratchImage LoadTex(const std::string& filePath);
+	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+	void LoadTexture(const std::string& filePath);
 	static DirectXManager* directXManager;
 	Triangle* triangle_[10];
 	TriangleData triangleVertex_[10];
@@ -33,7 +38,7 @@ private:
 	Transform triangleTransform_;
 	Transform cameraTransform_;
 	static WinApp* winApp_;
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
+    D3D12_INPUT_ELEMENT_DESC inputElementDescs_[2];
     IDxcUtils* dxcUtils_;
     IDxcIncludeHandler* includeHandler_;
     IDxcCompiler3* dxcCompiler_;
@@ -48,6 +53,12 @@ private:
     D3D12_RASTERIZER_DESC rasterizerDesc_;
     D3D12_VIEWPORT viewport_;
     D3D12_RECT scissorRect_;
-	D3D12_ROOT_PARAMETER rootParameters_[2];
+	D3D12_ROOT_PARAMETER rootParameters_[3];
+	D3D12_DESCRIPTOR_RANGE descriptorRange_[1] = {};
+	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
+	ID3D12Resource* textureResource_;
+public:
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
 };
 

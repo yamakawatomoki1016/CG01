@@ -1,4 +1,4 @@
-﻿#include "DirectXManager.h"
+#include "DirectXManager.h"
 #include <algorithm>
 #include <cassert>
 #include <thread>
@@ -272,6 +272,10 @@ ID3D12DescriptorHeap* DirectXManager::CreateDescriptorHeap(ID3D12Device* device,
 void DirectXManager::Finalize() {
 	CloseHandle(fenceEvent_);
 	fence_->Release();
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+	srvDescriptorHeap_->Release();
 	rtvDescriptorHeap_->Release();
 	backBuffers_[0]->Release();
 	backBuffers_[1]->Release();
@@ -282,7 +286,6 @@ void DirectXManager::Finalize() {
 	device_->Release();
 	useAdapter_->Release();
 	dxgiFactory_->Release();
-	srvDescriptorHeap_->Release();
 #ifdef DEBUG
 	winApp_->GetdebugController()->Release();
 #endif // DEBUG

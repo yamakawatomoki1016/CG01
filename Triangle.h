@@ -1,17 +1,13 @@
 #include "DirectXManager.h"
 #include "MyMath.h"
+#include "struct.h"
 #pragma once
-
-struct TriangleData {
-	Vector4 v1;
-	Vector4 v2;
-	Vector4 v3;
-};
+class MyEngine;
 
 class Triangle
 {
 public:
-	void Initialize(DirectXManager* directX, const TriangleData& vertex);
+	void Initialize(DirectXManager* directX, const TriangleData& vertex, MyEngine* myengine);
 	void Draw(const Vector4& material,const Matrix4x4& worldMatrix);
 	void CreateVertexResource();
 	void Finalize();
@@ -27,5 +23,7 @@ public:
 	Vector4* materialData_;
 	ID3D12Resource* wvpResource_;
 	Matrix4x4* wvpData_;
+private:
+	MyEngine* myengine_;
 };
 
