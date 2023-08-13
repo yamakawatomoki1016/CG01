@@ -92,6 +92,7 @@ void MyEngine::EndFrame()
 
 void MyEngine::Finalize()
 {
+	textureResource_->Release();
 	for (int i = 0; i < 10; i++) {
 		triangle_[i]->Finalize();
 	}
@@ -102,7 +103,7 @@ void MyEngine::Finalize()
 	}
 	rootSignature_->Release();
 	directXManager->Finalize();
-	textureResource_->Release();
+	
 }
 
 void MyEngine::Update()
