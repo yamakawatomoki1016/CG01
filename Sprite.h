@@ -13,7 +13,7 @@ public:
 	void CreateTransform();
 	void Finalize();
 private:
-	ID3D12Resource* vertexResorceSprite_;
+	ID3D12Resource* vertexResourceSprite_;
 	DirectXManager* directXManager_;
 	Triangle* triangle_;
 	VertexData* vertexDataSprite_{};
