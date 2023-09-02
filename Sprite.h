@@ -8,7 +8,7 @@ class Sprite
 {
 public:
 	void Initialize(DirectXManager* directXManager);
-	void Draw();
+	void Draw(Transform* transform);
 	void CreateVertexData();
 	void CreateTransform();
 	void Finalize();
@@ -16,10 +16,9 @@ private:
 	ID3D12Resource* vertexResourceSprite_;
 	DirectXManager* directXManager_;
 	Triangle* triangle_;
-	VertexData* vertexDataSprite_{};
+	VertexData* vertexDataSprite_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
 	ID3D12Resource* transformationMatrixResourceSprite_;
-	Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	WinApp* winApp_;
 	Matrix4x4* transformationMatrixDataSprite_;
 };

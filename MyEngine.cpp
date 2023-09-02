@@ -94,6 +94,7 @@ void MyEngine::EndFrame()
 
 void MyEngine::Finalize()
 {
+	sprite_->Finalize();
 	textureResource_->Release();
 	for (int i = 0; i < 2; i++) {
 		triangle_[i]->Finalize();
@@ -105,7 +106,6 @@ void MyEngine::Finalize()
 	}
 	rootSignature_->Release();
 	directXManager->Finalize();
-	
 }
 
 void MyEngine::Update()
@@ -120,6 +120,7 @@ void MyEngine::Update()
 	worldMatrix_ = worldViewProjectionMatrix;
 	ImGui::Begin("Triangle");
 	ImGui::DragFloat3("Translate",&triangleTransform_.translate.x,0.1f);
+	ImGui::DragFloat3("Translate", &transformSprite_.translate.x, 0.1f);
 	ImGui::ColorEdit4("Color Picker", &material[9].x);
 	ImGui::End();
 }
@@ -257,6 +258,9 @@ void MyEngine::VariableInitialize()
 	triangleVertex_[1].v2.position = { -0.0f,-0.0f,0.0f,1.0f };
 	triangleVertex_[1].v3.position = { 0.5f,-0.5f,-0.5f,1.0f };
 
+	sprite_ = new Sprite();
+	sprite_->Initialize(directXManager);
+	transformSprite_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	/*triangleVertex_[2].v1 = { -0.2f,-0.5f,0.0f,1.0f };
 	triangleVertex_[2].v2 = { -0.15f,-0.3f,0.0f,1.0f };
 	triangleVertex_[2].v3 = { -0.1f,-0.5f,0.0f,1.0f };
@@ -406,6 +410,7 @@ void MyEngine::Draw()
 	for (int i = 0; i < 2; i++) {
 		triangle_[i]->Draw(material[i],worldMatrix_);
 	}
+	sprite_->Draw(&transformSprite_);
 }
 
 DirectXManager* MyEngine::directXManager;
