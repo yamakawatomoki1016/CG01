@@ -9,8 +9,6 @@ void Sprite::Initialize(DirectXManager* directXManager)
 
 void Sprite::Draw(Transform* transform)
 {
-	
-
 	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transform->scale, transform->rotate, transform->translate);
 	Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
 	Matrix4x4 projectMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(winApp_->GetWidth()), float(winApp_->GetHeight()), 0.0f, 100.0f);

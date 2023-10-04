@@ -16,10 +16,11 @@ private:
 	ID3D12Resource* vertexResourceSprite_;
 	DirectXManager* directXManager_;
 	Triangle* triangle_;
-	VertexData* vertexDataSprite_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite_{};
 	ID3D12Resource* transformationMatrixResourceSprite_;
 	WinApp* winApp_;
 	Matrix4x4* transformationMatrixDataSprite_;
+public:
+	VertexData* vertexDataSprite_;
 };
 
