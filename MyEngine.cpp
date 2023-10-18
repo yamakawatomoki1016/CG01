@@ -7,17 +7,11 @@ void MyEngine::Initialize(WinApp* win, int32_t backBufferWidth, int32_t backBuff
 	directXManager->Initialize(win,backBufferWidth,backBufferHeight);
 
 	IntializeDxcCompiler();
-
 	CreateRootSignature();
-
 	BlendSetting();
-
 	RasiterzerState();
-
 	SetDepth();
-
 	CreateGraphicsPipelineState();
-
 	Viewport();
 }
 
@@ -261,38 +255,7 @@ void MyEngine::VariableInitialize()
 	sprite_ = new Sprite();
 	sprite_->Initialize(directXManager);
 	transformSprite_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	/*triangleVertex_[2].v1 = { -0.2f,-0.5f,0.0f,1.0f };
-	triangleVertex_[2].v2 = { -0.15f,-0.3f,0.0f,1.0f };
-	triangleVertex_[2].v3 = { -0.1f,-0.5f,0.0f,1.0f };
-
-	triangleVertex_[3].v1 = { -0.2f,-0.7f,0.0f,1.0f };
-	triangleVertex_[3].v2 = { -0.15f,-0.5f,0.0f,1.0f };
-	triangleVertex_[3].v3 = { -0.1f,-0.7f,0.0f,1.0f };
-
-	triangleVertex_[4].v1 = { -0.2f,-0.9f,0.0f,1.0f };
-	triangleVertex_[4].v2 = { -0.15f,-0.7f,0.0f,1.0f };
-	triangleVertex_[4].v3 = { -0.1f,-0.9f,0.0f,1.0f };
-
-	triangleVertex_[5].v1 = { -0.2f,0.1f,0.0f,1.0f };
-	triangleVertex_[5].v2 = { -0.15f,0.3f,0.0f,1.0f };
-	triangleVertex_[5].v3 = { -0.1f,0.1f,0.0f,1.0f };
-
-	triangleVertex_[6].v1 = { -0.2f,0.3f,0.0f,1.0f };
-	triangleVertex_[6].v2 = { -0.15f,0.5f,0.0f,1.0f };
-	triangleVertex_[6].v3 = { -0.1f,0.3f,0.0f,1.0f };
-
-	triangleVertex_[7].v1 = { -0.2f,0.5f,0.0f,1.0f };
-	triangleVertex_[7].v2 = { -0.15f,0.7f,0.0f,1.0f };
-	triangleVertex_[7].v3 = { -0.1f,0.5f,0.0f,1.0f };
-
-	triangleVertex_[8].v1 = { -0.2f,0.7f,0.0f,1.0f };
-	triangleVertex_[8].v2 = { -0.15f,0.9f,0.0f,1.0f };
-	triangleVertex_[8].v3 = { -0.1f,0.7f,0.0f,1.0f };
-
-	triangleVertex_[9].v1 = { -0.1f,0.1f,0.0f,1.0f };
-	triangleVertex_[9].v2 = { 0.25f,0.3f,0.0f,1.0f };
-	triangleVertex_[9].v3 = { 0.6f,0.1f,0.0f,1.0f };*/
-
+	
 	for (int i = 0; i < 2; i++) {
 		triangle_[i] = new Triangle();
 		triangle_[i]->Initialize(directXManager, triangleVertex_[i],this);
