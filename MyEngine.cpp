@@ -115,7 +115,7 @@ void MyEngine::Update()
 	ImGui::Begin("Triangle");
 	ImGui::DragFloat3("Translate",&triangleTransform_.translate.x,0.1f);
 	ImGui::DragFloat3("Translate", &transformSprite_.translate.x, 0.1f);
-	ImGui::ColorEdit4("Color Picker", &material[9].x);
+	ImGui::ColorEdit4("Color Picker", &material[1].x);
 	ImGui::End();
 }
 

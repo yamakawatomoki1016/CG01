@@ -77,14 +77,14 @@ void Sphere::Finalize()
 {
 	vertexResource_->Release();
 	wvpResource_->Release();
-	materialResource_->Release();
+	
 }
 
 void Sphere::CreateVertexData()
 {
 	vertexResource_ = triangle_->CreateBufferResource(directXManager_->GetDevice(), sizeof(VertexData) * 6);
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 }
