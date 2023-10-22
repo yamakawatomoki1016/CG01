@@ -7,6 +7,7 @@
 #include "DirectXManager.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "Sprite.h"
+#include "Sphere.h"
 #pragma comment(lib, "dxcompiler.lib")
 
 class MyEngine
@@ -20,6 +21,8 @@ public:
 	void EndFrame();
 	void Finalize();
 	void Update();
+	DirectXManager* GetDirectXCommon() { return directXManager; }
+	Matrix4x4 GetWorldTransform() { return worldMatrix_; }
 private:
 	void IntializeDxcCompiler();
 	void CreateRootSignature();
@@ -62,6 +65,7 @@ private:
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 	Sprite* sprite_;
 	Transform transformSprite_;
+	//Sphere* sphere_;
 public:
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;

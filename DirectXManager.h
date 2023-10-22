@@ -47,6 +47,7 @@ public:
 	static ID3D12Resource* depthStencilResource_;
 	static ID3D12DescriptorHeap* dsvDescriptorHeap_;
 	static D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
+	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();

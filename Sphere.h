@@ -9,8 +9,8 @@
 class Sphere
 {
 public:
-	void Initialize(DirectXManager* directXManager,MyEngine* myEngine);
-	void Draw(const Vector4& material,const Matrix4x4& wvpData);
+	void Initialize(DirectXManager* directXManager, MyEngine* myEngine);
+	void Draw(const Vector4& material, const Matrix4x4& wvpData);
 	void Finalize();
 	void CreateVertexData();
 	void CreateWVPResource();
@@ -30,5 +30,6 @@ private:
 	DirectXManager* directXManager_;
 	Triangle* triangle_;
 	MyEngine* myEngine_;
+	uint32_t vertexCount_;
 };
 

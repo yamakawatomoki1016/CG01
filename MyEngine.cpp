@@ -254,6 +254,8 @@ void MyEngine::VariableInitialize()
 
 	sprite_ = new Sprite();
 	sprite_->Initialize(directXManager);
+	/*sphere_ = new Sphere();
+	sphere_->Initialize(directXManager,this);*/
 	transformSprite_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	
 	for (int i = 0; i < 2; i++) {
@@ -374,6 +376,7 @@ void MyEngine::Draw()
 		triangle_[i]->Draw(material[i],worldMatrix_);
 	}
 	sprite_->Draw(&transformSprite_);
+	//sphere_->Draw(material[0], worldMatrix_);
 }
 
 DirectXManager* MyEngine::directXManager;

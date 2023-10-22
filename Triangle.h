@@ -18,7 +18,6 @@ public:
 	ID3D12Resource* vertexResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	TriangleData* vertexData_;
-	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 	ID3D12Resource* MaterialResource_;
 	Vector4* materialData_;
 	ID3D12Resource* wvpResource_;
