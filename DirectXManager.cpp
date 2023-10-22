@@ -20,22 +20,19 @@ void DirectXManager::Initialize(WinApp* win, int32_t backBufferWidth, int32_t ba
 	winApp_->CreateGameWindow(L"CG2", 1280, 720);
 	// DXGIデバイス初期化
 	InitializeDXGIDevice();
-
 	// コマンド関連初期化
 	InitializeCommand();
-
 	// スワップチェーンの生成
 	CreateSwapChain();
-
 	// レンダーターゲット生成
 	CreateFinalRenderTargets();
-
 	// フェンス生成
 	CreateFence();
-
 	CreateDepthStencil();
-
 	ImguiInitialize();
+	descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 }
 
 void DirectXManager::ImguiInitialize() {
@@ -150,7 +147,6 @@ void DirectXManager::CreateSwapChain() {
 	//コマンドキュー、ウィンドウハンドル、設定を渡して生成する
 	hr_ = dxgiFactory_->CreateSwapChainForHwnd(commandQueue_, winApp_->GetHwnd(), &swapChainDesc_, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
 	assert(SUCCEEDED(hr_));
-
 	//ディスクリプタヒープの生成
 	rtvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
@@ -170,7 +166,6 @@ void DirectXManager::CreateFinalRenderTargets() {
 	rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;//2Dテクスチャとして書き込む
 	//ディスクリプタの先頭を取得する
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-
 	//まず一つ目を作る。一つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある
 	rtvHandles_[0] = rtvStartHandle;
 	device_->CreateRenderTargetView(backBuffers_[0], &rtvDesc_, rtvHandles_[0]);
@@ -375,6 +370,18 @@ ID3D12Resource* DirectXManager::CreateBufferResource(ID3D12Device* device, size_
 	assert(SUCCEEDED(hr));
 
 	return Resource;
+}
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXManager::GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize * index);
+	return handleCPU;
+}
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXManager::GetGpuDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize * index);
+	return handleGPU;
 }
 WinApp* DirectXManager::winApp_;
 IDXGIAdapter4* DirectXManager::useAdapter_;

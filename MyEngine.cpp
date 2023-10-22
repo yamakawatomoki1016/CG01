@@ -105,7 +105,7 @@ void MyEngine::Finalize()
 void MyEngine::Update()
 {
 	ImGui::ShowDemoWindow();
-	triangleTransform_.rotate.y += 0.01f;
+	triangleTransform_.rotate.y += 0.001f;
 	worldMatrix_ = MakeAffineMatrix(triangleTransform_.scale, triangleTransform_.rotate, triangleTransform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -113,9 +113,10 @@ void MyEngine::Update()
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix_, Multiply(viewMatrix, projectionMatrix));
 	worldMatrix_ = worldViewProjectionMatrix;
 	ImGui::Begin("Triangle");
-	ImGui::DragFloat3("Translate",&triangleTransform_.translate.x,0.1f);
+	ImGui::DragFloat3("Translate",&triangleTransform_.rotate.x,0.1f);
 	ImGui::DragFloat3("Translate", &transformSprite_.translate.x, 0.1f);
 	ImGui::ColorEdit4("Color Picker", &material[1].x);
+	ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 	ImGui::End();
 }
 
@@ -290,7 +291,6 @@ DirectX::ScratchImage MyEngine::LoadTex(const std::string& filePath)
 	std::wstring filePathW = ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
-
 	DirectX::ScratchImage mipImages{};
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
 	assert(SUCCEEDED(hr));
@@ -326,12 +326,24 @@ ID3D12Resource* MyEngine::CreateTextureResource(ID3D12Device* device, const Dire
 	return resource;
 }
 
-void MyEngine::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
+void MyEngine::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Resource* texture2, const DirectX::ScratchImage& mipImages2)
 {
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
 		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
 		HRESULT hr = texture->WriteToSubresource(
+			UINT(mipLevel),
+			nullptr,
+			img->pixels,
+			UINT(img->rowPitch),
+			UINT(img->slicePitch)
+		);
+		assert(SUCCEEDED(hr));
+	}
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
+		const DirectX::Image* img = mipImages2.GetImage(mipLevel, 0, 0);
+		HRESULT hr = texture2->WriteToSubresource(
 			UINT(mipLevel),
 			nullptr,
 			img->pixels,
@@ -347,20 +359,33 @@ void MyEngine::LoadTexture(const std::string& filePath)
 	DirectX::ScratchImage mipImages = LoadTex(filePath);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource_ = CreateTextureResource(directXManager->GetDevice(), metadata);
-	UploadTextureData(textureResource_, mipImages);
+	
 
+	DirectX::ScratchImage mipImages2 = LoadTex("resources/monsterBall.png");
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	textureResource2_ = CreateTextureResource(directXManager->GetDevice(), metadata2);
+	UploadTextureData(textureResource_, mipImages,textureResource2_, mipImages2);
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-	textureSrvHandleCPU_ = directXManager->srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    textureSrvHandleGPU_ = directXManager->srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-
+	textureSrvHandleCPU_ = directXManager->GetCPUDescriptorHandle(directXManager->srvDescriptorHeap_, directXManager->descriptorSizeRTV_, 1);
+	textureSrvHandleGPU_ = directXManager->GetGpuDescriptorHandle(directXManager->srvDescriptorHeap_, directXManager->descriptorSizeSRV_, 1);
 	textureSrvHandleCPU_.ptr += directXManager->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	textureSrvHandleGPU_.ptr += directXManager->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
 	directXManager->GetDevice()->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU_);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	srvDesc2.Format = metadata2.format;
+	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+	textureSrvHandleCPU2_ = directXManager->GetCPUDescriptorHandle(directXManager->srvDescriptorHeap_, directXManager->descriptorSizeRTV_, 2);
+	textureSrvHandleGPU2_ = directXManager->GetGpuDescriptorHandle(directXManager->srvDescriptorHeap_, directXManager->descriptorSizeSRV_, 2);
+	textureSrvHandleCPU2_.ptr += directXManager->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU2_.ptr += directXManager->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	directXManager->GetDevice()->CreateShaderResourceView(textureResource2_, &srvDesc2, textureSrvHandleCPU2_);
 }
 
 void MyEngine::SetDepth()

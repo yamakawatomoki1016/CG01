@@ -32,7 +32,7 @@ private:
 	void Viewport();
 	DirectX::ScratchImage LoadTex(const std::string& filePath);
 	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
-	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Resource* texture2, const DirectX::ScratchImage& mipImages2);
 	void LoadTexture(const std::string& filePath);
 	void SetDepth();
 	static DirectXManager* directXManager;
@@ -62,12 +62,15 @@ private:
 	D3D12_DESCRIPTOR_RANGE descriptorRange_[1] = {};
 	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
 	ID3D12Resource* textureResource_;
+	ID3D12Resource* textureResource2_;
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 	Sprite* sprite_;
 	Transform transformSprite_;
-	//Sphere* sphere_;
 public:
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2_;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2_;
+	bool useMonsterBall = true;
 };
 

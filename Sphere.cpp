@@ -54,7 +54,7 @@ void Sphere::Draw(const Vector4& material, const Matrix4x4& wvpData)
 	directXManager_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	directXManager_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());//material用のCBufferの場所を設定
 	directXManager_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
-	directXManager_->GetCommandList()->SetGraphicsRootDescriptorTable(2, myEngine_->textureSrvHandleGPU_);
+	directXManager_->GetCommandList()->SetGraphicsRootDescriptorTable(2, myEngine_->useMonsterBall ? myEngine_->textureSrvHandleGPU2_ : myEngine_->textureSrvHandleGPU_);
 	//描画！(DrawCall/ドローコール)・3頂点で1つのインスタンス。インスタンスについては今後
 	directXManager_->GetCommandList()->DrawInstanced(vertexCount_, 1, 0, 0);
 

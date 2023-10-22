@@ -48,6 +48,11 @@ public:
 	static ID3D12DescriptorHeap* dsvDescriptorHeap_;
 	static D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	uint32_t descriptorSizeSRV_;
+	uint32_t descriptorSizeRTV_;
+	uint32_t descriptorSizeDSV_;
 private:
 	void InitializeDXGIDevice();
 	void CreateSwapChain();
