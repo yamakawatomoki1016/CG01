@@ -90,6 +90,7 @@ void MyEngine::Finalize()
 {
 	sprite_->Finalize();
 	textureResource_->Release();
+	textureResource2_->Release();
 	for (int i = 0; i < 2; i++) {
 		triangle_[i]->Finalize();
 	}
